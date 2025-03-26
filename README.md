@@ -17,25 +17,25 @@ Welcome to the **Pig Game** project! This repository contains a simple implement
 The **Pig Game** is a simple dice game where **two players** take turns rolling a single die. Players accumulate points on each roll, but **rolling a 1 resets the turn’s score**. The first player to reach **100 points wins**!
 
 This project is a **web-based** version of the game, built using:
-✅ **JavaScript** for game logic
-✅ **CSS** for styling
-✅ **HTML** for structure
+- ✅ **JavaScript** for game logic
+- ✅ **CSS** for styling
+- ✅ **HTML** for structure
 
 ## 🎲 Game Rules
 
-1️⃣ Two players take turns rolling a **single die**.
-2️⃣ Each rolled number is **added** to the player's current turn score.
-3️⃣ If a player rolls a **1**, they lose all turn points, and their turn ends.
-4️⃣ A player can **"Hold"** to save their turn score and pass the turn.
-5️⃣ The first player to reach **100 points** **wins the game**.
+- 1️⃣ Two players take turns rolling a **single die**.
+- 2️⃣ Each rolled number is **added** to the player's current turn score.
+- 3️⃣ If a player rolls a **1**, they lose all turn points, and their turn ends.
+- 4️⃣ A player can **"Hold"** to save their turn score and pass the turn.
+- 5️⃣ The first player to reach **100 points** **wins the game**.
 
 ## ✨ Features
 
-✅ Simple and intuitive user interface
-✅ Roll the die to accumulate points
-✅ "Hold" option to save points and pass the turn
-✅ Real-time score updates
-✅ Automatic winner announcement
+- ✅ Simple and intuitive user interface
+- ✅ Roll the die to accumulate points
+- ✅ "Hold" option to save points and pass the turn
+- ✅ Real-time score updates
+- ✅ Automatic winner announcement
 
 ## ⚡ Installation
 
@@ -55,10 +55,10 @@ Simply open the `index.html` file in your web browser to start playing.
 
 ## 🕹️ Usage
 
-1️⃣ Open the `index.html` file in your web browser.
-2️⃣ Click the **"Roll Dice"** button to roll the die and accumulate points.
-3️⃣ Click the **"Hold"** button to save your points and pass the turn.
-4️⃣ The first player to reach **100 points wins the game**!
+- 1️⃣ Open the `index.html` file in your web browser.
+- 2️⃣ Click the **"Roll Dice"** button to roll the die and accumulate points.
+- 3️⃣ Click the **"Hold"** button to save your points and pass the turn.
+- 4️⃣ The first player to reach **100 points wins the game**!
 
 ## 🤝 Contributing
 
