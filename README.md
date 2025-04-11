@@ -79,3 +79,8 @@ Contributions are welcome! If you’d like to improve the project, follow these 
 ## 📜 License
 
 This project is licensed under the **MIT License**. See the `LICENSE` file for details.
+
+## 🙏 Acknowledgments
+
+This project was built by following along with the Ultimate JavaScript course by Jonas Schmedtmann.
+I used this project to practice JavaScript fundamentals like event handling, game logic, DOM manipulation, and UI feedback.
