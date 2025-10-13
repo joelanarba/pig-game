@@ -64,7 +64,7 @@ io.on('connection', (socket) => {
 
         if (game.scores[game.activePlayer] >= 100) {
             game.playing = false;
-            io.to(roomCode.emit('gameOver', { game, winner: game.activePlayer }));
+            io.to(roomCode).emit('gameOver', { game, winner: game.activePlayer });
         } else {
             //Switch player
             game.activePlayer = game.activePlayer === 0 ? 1 : 0;
