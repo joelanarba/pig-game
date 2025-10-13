@@ -13,56 +13,54 @@ const btnRoll = document.querySelector('.btn--roll');
 const btnHold = document.querySelector('.btn--hold');
 const gameSetupDiv = document.getElementById('game-setup');
 const mainGame = document.querySelector('main');
-
 const statusMessageEl = document.getElementById('status-message');
 
 // This function updates the entire UI based on the state from the server
 function updateUI(gameState, diceValue, myPlayerNumber) {
+  statusMessageEl.textContent = ''; // Clear status message during gameplay
+  score0El.textContent = gameState.scores[0];
+  score1El.textContent = gameState.scores[1];
+  current0El.textContent = 0;
+  current1El.textContent = 0;
+  document.getElementById(`current--${gameState.activePlayer}`).textContent =
+    gameState.currentScore;
 
-    statusMessageEl.textContent = '';
-    score0El.textContent = gameState.scores[0];
-    score1El.textContent = gameState.scores[1];
-    current0El.textContent = 0;
-    current1El.textContent = 0;
-    document.getElementById(`current--${gameState.activePlayer}`).textContent = gameState.currentScore;
+  if (diceValue) {
+    diceEl.classList.remove('hidden');
+    diceEl.src = `dice-${diceValue}.png`;
+  } else {
+    diceEl.classList.add('hidden');
+  }
 
-    if (diceValue) {
-        diceEl.classList.remove('hidden');
-        diceEl.src = `dice-${diceValue}.png`;
-    } else {
-        diceEl.classList.add('hidden');
-    }
+  player0El.classList.remove('player--active');
+  player1El.classList.remove('player--active');
+  document
+    .querySelector(`.player--${gameState.activePlayer}`)
+    .classList.add('player--active');
 
-    if (gameState.activePlayer === 0) {
-        player0El.classList.add('player--active');
-        player1El.classList.remove('player--active');
-    } else {
-        player1El.classList.add('player--active');
-        player0El.classList.remove('player--active');
-    }
+  // CRITICAL LOGIC: Enable buttons only if it's your turn
+  const isMyTurn = gameState.activePlayer === myPlayerNumber;
+  btnRoll.disabled = !gameState.playing || !isMyTurn;
+  btnHold.disabled = !gameState.playing || !isMyTurn;
 
-     // Check if it's my turn
-    const isMyTurn = gameState.activePlayer === myPlayerNumber;
-
-    // Disable buttons if the game is over OR if it's not my turn
-    btnRoll.disabled = !gameState.playing || !isMyTurn;
-    btnHold.disabled = !gameState.playing || !isMyTurn;
-
-    player0El.classList.remove('player--winner');
-    player1El.classList.remove('player--winner');
+  player0El.classList.remove('player--winner');
+  player1El.classList.remove('player--winner');
 }
 
 function showWinner(winnerPlayer) {
-    document.querySelector(`.player--${winnerPlayer}`).classList.add('player--winner');
-    diceEl.classList.add('hidden');
+  document
+    .querySelector(`.player--${winnerPlayer}`)
+    .classList.add('player--winner');
+  diceEl.classList.add('hidden');
 }
 
 function showGame() {
-    gameSetupDiv.classList.add('hidden');
-    mainGame.classList.remove('hidden');
+  gameSetupDiv.classList.add('hidden');
+  mainGame.classList.remove('hidden');
 }
 
 function hideGame() {
-    gameSetupDiv.classList.remove('hidden');
-    mainGame.classList.add('hidden');
+  gameSetupDiv.classList.remove('hidden');
+  mainGame.classList.add('hidden');
+  document.getElementById('game-code-input').value = '';
 }
