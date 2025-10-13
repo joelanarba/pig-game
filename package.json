@@ -1,0 +1,26 @@
+{
+  "name": "pig-game",
+  "version": "1.0.0",
+  "description": "Welcome to the **Pig Game** project! This repository contains a simple implementation of the Pig game using **JavaScript, CSS, and HTML**.",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/joelanarba/pig-game.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/joelanarba/pig-game/issues"
+  },
+  "homepage": "https://github.com/joelanarba/pig-game#readme",
+  "dependencies": {
+    "express": "^5.1.0",
+    "socket.io": "^4.8.1"
+  }
+}
