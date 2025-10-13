@@ -30,10 +30,22 @@ io.on('connection', (socket) => {
 
     //Join an existing game room
     socket.on('joinGame', (roomCode) => {
-        if (gameRooms[roomCode] && Object.keys(gameRooms[roomCode].players).length === 1 ) {
+        const room = gameRooms[roomCode]; // Define the 'room' variable right away
+
+        if (room && Object.keys(room.players).length === 1 ) {
             socket.join(roomCode);
-            gameRooms[roomCode].players[socket.id] = 1; //Player 2
-            io.to(roomCode).emit('startGame', gameRooms[roomCode]);
+            room.players[socket.id] = 1; // Player 2
+
+            // Now, this code will work correctly
+            const playerIds = Object.keys(room.players);
+            
+            // Find player 0's ID and player 1's ID
+            const player0_ID = playerIds.find(id => room.players[id] === 0);
+            const player1_ID = playerIds.find(id => room.players[id] === 1);
+
+            // Send the 'startGame' event to each player with their specific player number
+            io.to(player0_ID).emit('startGame', { gameState: room, playerNumber: 0 });
+            io.to(player1_ID).emit('startGame', { gameState: room, playerNumber: 1 });
         } else {
             socket.emit('error', 'Invalid or full game code.');
         }
@@ -43,6 +55,12 @@ io.on('connection', (socket) => {
     socket.on('rollDice', (roomCode) => {
         if (!gameRooms[roomCode]) return;
         const game = gameRooms[roomCode];
+
+        // Check if the message is from the correct player
+        const playerNumber = game.players[socket.id];
+        if (playerNumber !== game.activePlayer) {
+            return; 
+        }
         const dice = Math.trunc(Math.random() * 6) + 1;
 
         if (dice !== 1) {
@@ -58,6 +76,12 @@ io.on('connection', (socket) => {
     socket.on('holdScore', (roomCode) => {
         if (!gameRooms[roomCode]) return;
         const game = gameRooms[roomCode];
+
+        // Check if the message is from the correct player
+        const playerNumber = game.players[socket.id];
+        if (playerNumber !== game.activePlayer) {
+            return; // It's not this player's turn, so ignore the request.
+        }
 
         game.scores[game.activePlayer] += game.currentScore;
         game.currentScore = 0;

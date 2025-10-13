@@ -14,8 +14,12 @@ const btnHold = document.querySelector('.btn--hold');
 const gameSetupDiv = document.getElementById('game-setup');
 const mainGame = document.querySelector('main');
 
+const statusMessageEl = document.getElementById('status-message');
+
 // This function updates the entire UI based on the state from the server
-function updateUI(gameState, diceValue) {
+function updateUI(gameState, diceValue, myPlayerNumber) {
+
+    statusMessageEl.textContent = '';
     score0El.textContent = gameState.scores[0];
     score1El.textContent = gameState.scores[1];
     current0El.textContent = 0;
@@ -37,9 +41,12 @@ function updateUI(gameState, diceValue) {
         player0El.classList.remove('player--active');
     }
 
-    // Enable/disable buttons based on playing state
-    btnRoll.disabled = !gameState.playing;
-    btnHold.disabled = !gameState.playing;
+     // Check if it's my turn
+    const isMyTurn = gameState.activePlayer === myPlayerNumber;
+
+    // Disable buttons if the game is over OR if it's not my turn
+    btnRoll.disabled = !gameState.playing || !isMyTurn;
+    btnHold.disabled = !gameState.playing || !isMyTurn;
 
     player0El.classList.remove('player--winner');
     player1El.classList.remove('player--winner');

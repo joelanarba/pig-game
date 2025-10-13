@@ -228,3 +228,13 @@ main {
   margin-top: 1rem;
   height: 2rem; 
 }
+
+#status-message {
+  position: absolute;
+  top: 12rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 2rem;
+  font-weight: 500;
+  color: #333;
+}
