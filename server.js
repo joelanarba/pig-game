@@ -41,7 +41,7 @@ io.on('connection', socket => {
     };
     
     console.log(`🎮 Game created: ${roomCode} by ${socket.id}`);
-    socket.emit('gameCreated', { roomCode });
+    socket.emit('gameCreated', roomCode);
   });
 
   socket.on('joinGame', roomCode => {
