@@ -8,23 +8,24 @@ const score1El = document.getElementById('score--1');
 const current0El = document.getElementById('current--0');
 const current1El = document.getElementById('current--1');
 const diceEl = document.querySelector('.dice');
-const btnNew = document.querySelector('.btn--new');
-const btnRoll = document.querySelector('.btn--roll');
-const btnHold = document.querySelector('.btn--hold');
 const gameSetupDiv = document.getElementById('game-setup');
 const mainGame = document.querySelector('main');
-const statusMessageEl = document.getElementById('status-message');
 
 // This function updates the entire UI based on the state from the server
 function updateUI(gameState, diceValue, myPlayerNumber) {
-  statusMessageEl.textContent = ''; // Clear status message during gameplay
+  // Update scores
   score0El.textContent = gameState.scores[0];
   score1El.textContent = gameState.scores[1];
+  
+  // Reset current scores
   current0El.textContent = 0;
   current1El.textContent = 0;
+  
+  // Set active player's current score
   document.getElementById(`current--${gameState.activePlayer}`).textContent =
     gameState.currentScore;
 
+  // Show/hide dice
   if (diceValue) {
     diceEl.classList.remove('hidden');
     diceEl.src = `dice-${diceValue}.png`;
@@ -32,17 +33,21 @@ function updateUI(gameState, diceValue, myPlayerNumber) {
     diceEl.classList.add('hidden');
   }
 
+  // Update active player styling
   player0El.classList.remove('player--active');
   player1El.classList.remove('player--active');
   document
     .querySelector(`.player--${gameState.activePlayer}`)
     .classList.add('player--active');
 
-  // CRITICAL LOGIC: Enable buttons only if it's your turn
+  // Enable/disable buttons based on turn
+  const btnRoll = document.querySelector('.btn--roll');
+  const btnHold = document.querySelector('.btn--hold');
   const isMyTurn = gameState.activePlayer === myPlayerNumber;
   btnRoll.disabled = !gameState.playing || !isMyTurn;
   btnHold.disabled = !gameState.playing || !isMyTurn;
 
+  // Remove winner class (in case of new game)
   player0El.classList.remove('player--winner');
   player1El.classList.remove('player--winner');
 }
@@ -52,6 +57,12 @@ function showWinner(winnerPlayer) {
     .querySelector(`.player--${winnerPlayer}`)
     .classList.add('player--winner');
   diceEl.classList.add('hidden');
+  
+  // Disable game buttons
+  const btnRoll = document.querySelector('.btn--roll');
+  const btnHold = document.querySelector('.btn--hold');
+  btnRoll.disabled = true;
+  btnHold.disabled = true;
 }
 
 function showGame() {
@@ -63,4 +74,14 @@ function hideGame() {
   gameSetupDiv.classList.remove('hidden');
   mainGame.classList.add('hidden');
   document.getElementById('game-code-input').value = '';
+  
+  // Reset game display
+  score0El.textContent = 0;
+  score1El.textContent = 0;
+  current0El.textContent = 0;
+  current1El.textContent = 0;
+  diceEl.classList.add('hidden');
+  player0El.classList.remove('player--winner', 'player--active');
+  player1El.classList.remove('player--winner', 'player--active');
+  player0El.classList.add('player--active');
 }

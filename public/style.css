@@ -148,6 +148,12 @@ main {
   outline: none;
 }
 
+.btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+  background-color: rgba(200, 200, 200, 0.6);
+}
+
 .dice {
   position: absolute;
   left: 50%;
@@ -206,6 +212,12 @@ main {
   transition: all 0.2s;
 }
 
+#game-setup button:hover {
+  background-color: rgba(255, 255, 255, 0.9);
+  transform: translateY(-2px);
+  box-shadow: 0 2rem 4rem rgba(0, 0, 0, 0.15);
+}
+
 #game-setup button:active {
   transform: translateY(3px);
   box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.15);
@@ -237,4 +249,7 @@ main {
   font-size: 2rem;
   font-weight: 500;
   color: #333;
+  background-color: rgba(255, 255, 255, 0.8);
+  padding: 1rem 2rem;
+  border-radius: 50rem;
 }
