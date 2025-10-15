@@ -64,18 +64,15 @@ socket.on('gameCreated', code => {
   btnHold.disabled = true;
 });
 
-socket.on('startGame', ({ gameState, playerNumber }) => {
+socket.on('startGame', ({ gameState, playerNumber, roomCode: receivedRoomCode }) => {
   console.log('Game starting! You are player', playerNumber);
+  console.log('Received game state:', gameState);
+  
   myPlayerNumber = playerNumber;
   
-  // If we don't have roomCode yet (joining player), find it
-  if (!roomCode) {
-    for (const room of socket.rooms) {
-      if (room !== socket.id) {
-        roomCode = room;
-        break;
-      }
-    }
+  // Set roomCode from server (important for joining player)
+  if (receivedRoomCode) {
+    roomCode = receivedRoomCode;
   }
   
   showGame();
@@ -95,12 +92,15 @@ socket.on('startGame', ({ gameState, playerNumber }) => {
   btnHold.disabled = !isMyTurn;
 });
 
-socket.on('updateGameState', ({ game, dice }) => {
-  console.log('Game state updated, dice:', dice);
-  updateUI(game, dice, myPlayerNumber);
+socket.on('updateGameState', ({ gameState, dice }) => {
+  console.log('Game state updated');
+  console.log('  Game state:', gameState);
+  console.log('  Dice:', dice);
+  
+  updateUI(gameState, dice, myPlayerNumber);
   
   // Update status message
-  const isMyTurn = game.activePlayer === myPlayerNumber;
+  const isMyTurn = gameState.activePlayer === myPlayerNumber;
   if (isMyTurn) {
     statusMessageEl.textContent = "It's YOUR turn! 🎲";
   } else {
@@ -109,9 +109,11 @@ socket.on('updateGameState', ({ game, dice }) => {
   statusMessageEl.style.display = 'block';
 });
 
-socket.on('gameOver', ({ game, winner }) => {
+socket.on('gameOver', ({ gameState, winner }) => {
   console.log('Game over! Winner:', winner);
-  updateUI(game, null, myPlayerNumber);
+  console.log('Final game state:', gameState);
+  
+  updateUI(gameState, null, myPlayerNumber);
   showWinner(winner);
   
   const winnerText = winner === myPlayerNumber ? '🎉 You WON! 🎉' : '😢 You lost!';

@@ -10,6 +10,21 @@ app.use(express.static('public'));
 
 let gameRooms = {};
 
+// Helper function to create a deep copy of game state for sending to clients
+function getGameStateForClient(room) {
+  return {
+    scores: [...room.scores],
+    currentScore: room.currentScore,
+    activePlayer: room.activePlayer,
+    playing: room.playing
+  };
+}
+
+// Helper function to get the OTHER player's socket ID
+function getOtherPlayerId(room, currentSocketId) {
+  return Object.keys(room.players).find(id => id !== currentSocketId);
+}
+
 io.on('connection', socket => {
   console.log('✅ User connected:', socket.id);
 
@@ -18,7 +33,7 @@ io.on('connection', socket => {
     socket.join(roomCode);
     
     gameRooms[roomCode] = {
-      players: { [socket.id]: 0 },
+      players: { [socket.id]: 0 }, // socketId -> playerNumber mapping
       scores: [0, 0],
       currentScore: 0,
       activePlayer: 0,
@@ -26,7 +41,7 @@ io.on('connection', socket => {
     };
     
     console.log(`🎮 Game created: ${roomCode} by ${socket.id}`);
-    socket.emit('gameCreated', roomCode);
+    socket.emit('gameCreated', { roomCode });
   });
 
   socket.on('joinGame', roomCode => {
@@ -51,31 +66,40 @@ io.on('connection', socket => {
     const player1_ID = playerIds.find(id => room.players[id] === 1);
 
     console.log(`🎮 Player joined ${roomCode}. Starting game!`);
-    console.log(`   Player 0 (${player0_ID}): ${room.players[player0_ID]}`);
-    console.log(`   Player 1 (${player1_ID}): ${room.players[player1_ID]}`);
+    console.log(`   Player 0 (${player0_ID})`);
+    console.log(`   Player 1 (${player1_ID})`);
     console.log(`   Active player: ${room.activePlayer}`);
 
-    // Send game state to BOTH players
+    // Send SEPARATE game state copies to each player with their room code
+    const gameState = getGameStateForClient(room);
+    
     io.to(player0_ID).emit('startGame', { 
-      gameState: room, 
-      playerNumber: 0 
+      gameState, 
+      playerNumber: 0,
+      roomCode 
     });
     io.to(player1_ID).emit('startGame', { 
-      gameState: room, 
-      playerNumber: 1 
+      gameState, 
+      playerNumber: 1,
+      roomCode 
     });
   });
 
   socket.on('rollDice', roomCode => {
-    const game = gameRooms[roomCode];
-    if (!game || !game.playing) {
+    const room = gameRooms[roomCode];
+    if (!room || !room.playing) {
       console.log('❌ Cannot roll - game not playing');
       return;
     }
 
-    const playerNumber = game.players[socket.id];
-    if (playerNumber !== game.activePlayer) {
-      console.log(`❌ ${socket.id} tried to roll but it's not their turn (player ${playerNumber}, active ${game.activePlayer})`);
+    const playerNumber = room.players[socket.id];
+    if (playerNumber === undefined) {
+      console.log('❌ Player not in this game');
+      return;
+    }
+    
+    if (playerNumber !== room.activePlayer) {
+      console.log(`❌ ${socket.id} tried to roll but it's not their turn (player ${playerNumber}, active ${room.activePlayer})`);
       return;
     }
 
@@ -83,67 +107,98 @@ io.on('connection', socket => {
     console.log(`🎲 Player ${playerNumber} rolled ${dice}`);
 
     if (dice !== 1) {
-      game.currentScore += dice;
-      console.log(`   Current score: ${game.currentScore}`);
+      room.currentScore += dice;
+      console.log(`   Current score: ${room.currentScore}`);
     } else {
       console.log(`   💥 Rolled 1! Switching turns`);
-      game.currentScore = 0;
-      game.activePlayer = game.activePlayer === 0 ? 1 : 0;
+      room.currentScore = 0;
+      room.activePlayer = room.activePlayer === 0 ? 1 : 0;
     }
 
-    io.to(roomCode).emit('updateGameState', { game, dice });
+    // Send fresh copies of game state to ALL players in the room
+    const gameState = getGameStateForClient(room);
+    io.to(roomCode).emit('updateGameState', { 
+      gameState, 
+      dice 
+    });
   });
 
   socket.on('holdScore', roomCode => {
-    const game = gameRooms[roomCode];
-    if (!game || !game.playing) {
+    const room = gameRooms[roomCode];
+    if (!room || !room.playing) {
       console.log('❌ Cannot hold - game not playing');
       return;
     }
 
-    const playerNumber = game.players[socket.id];
-    if (playerNumber !== game.activePlayer) {
+    const playerNumber = room.players[socket.id];
+    if (playerNumber === undefined) {
+      console.log('❌ Player not in this game');
+      return;
+    }
+    
+    if (playerNumber !== room.activePlayer) {
       console.log(`❌ ${socket.id} tried to hold but it's not their turn`);
       return;
     }
 
-    game.scores[game.activePlayer] += game.currentScore;
-    console.log(`📥 Player ${game.activePlayer} held score: ${game.currentScore}`);
-    console.log(`   Total scores: [${game.scores[0]}, ${game.scores[1]}]`);
+    room.scores[room.activePlayer] += room.currentScore;
+    console.log(`📥 Player ${room.activePlayer} held score: ${room.currentScore}`);
+    console.log(`   Total scores: [${room.scores[0]}, ${room.scores[1]}]`);
     
-    game.currentScore = 0;
+    room.currentScore = 0;
 
-    if (game.scores[game.activePlayer] >= 100) {
-      game.playing = false;
-      console.log(`🎉 Player ${game.activePlayer} WINS!`);
-      io.to(roomCode).emit('gameOver', { game, winner: game.activePlayer });
+    if (room.scores[room.activePlayer] >= 100) {
+      room.playing = false;
+      const winner = room.activePlayer;
+      console.log(`🎉 Player ${winner} WINS!`);
+      
+      const gameState = getGameStateForClient(room);
+      io.to(roomCode).emit('gameOver', { 
+        gameState, 
+        winner 
+      });
     } else {
-      game.activePlayer = game.activePlayer === 0 ? 1 : 0;
-      console.log(`   Switching to player ${game.activePlayer}`);
-      io.to(roomCode).emit('updateGameState', { game, dice: null });
+      room.activePlayer = room.activePlayer === 0 ? 1 : 0;
+      console.log(`   Switching to player ${room.activePlayer}`);
+      
+      const gameState = getGameStateForClient(room);
+      io.to(roomCode).emit('updateGameState', { 
+        gameState, 
+        dice: null 
+      });
     }
   });
 
   socket.on('newGame', roomCode => {
-    const game = gameRooms[roomCode];
-    if (!game) return;
+    const room = gameRooms[roomCode];
+    if (!room) return;
 
     console.log(`🔄 New game starting in ${roomCode}`);
     
-    game.scores = [0, 0];
-    game.currentScore = 0;
-    game.activePlayer = 0;
-    game.playing = true;
+    room.scores = [0, 0];
+    room.currentScore = 0;
+    room.activePlayer = 0;
+    room.playing = true;
 
-    const playerIds = Object.keys(game.players);
-    const player0_ID = playerIds.find(id => game.players[id] === 0);
-    const player1_ID = playerIds.find(id => game.players[id] === 1);
+    const playerIds = Object.keys(room.players);
+    const player0_ID = playerIds.find(id => room.players[id] === 0);
+    const player1_ID = playerIds.find(id => room.players[id] === 1);
+
+    const gameState = getGameStateForClient(room);
 
     if (player0_ID) {
-      io.to(player0_ID).emit('startGame', { gameState: game, playerNumber: 0 });
+      io.to(player0_ID).emit('startGame', { 
+        gameState, 
+        playerNumber: 0,
+        roomCode 
+      });
     }
     if (player1_ID) {
-      io.to(player1_ID).emit('startGame', { gameState: game, playerNumber: 1 });
+      io.to(player1_ID).emit('startGame', { 
+        gameState, 
+        playerNumber: 1,
+        roomCode 
+      });
     }
   });
 
