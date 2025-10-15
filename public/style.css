@@ -29,7 +29,6 @@ main {
   height: 60rem;
   background-color: rgba(255, 255, 255, 0.35);
   backdrop-filter: blur(200px);
-  filter: blur();
   box-shadow: 0 3rem 5rem rgba(0, 0, 0, 0.25);
   border-radius: 9px;
   overflow: hidden;
@@ -113,11 +112,8 @@ main {
   cursor: pointer;
   font-weight: 400;
   transition: all 0.2s;
-
-  background-color: white;
   background-color: rgba(255, 255, 255, 0.6);
   backdrop-filter: blur(10px);
-
   padding: 0.7rem 2.5rem;
   border-radius: 50rem;
   box-shadow: 0 1.75rem 3.5rem rgba(0, 0, 0, 0.1);
@@ -139,7 +135,11 @@ main {
   top: 46.1rem;
 }
 
-.btn:active {
+.btn:not(:disabled):hover {
+  background-color: rgba(255, 255, 255, 0.8);
+}
+
+.btn:not(:disabled):active {
   transform: translate(-50%, 3px);
   box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.15);
 }
@@ -150,8 +150,8 @@ main {
 
 .btn:disabled {
   cursor: not-allowed;
-  opacity: 0.5;
-  background-color: rgba(200, 200, 200, 0.6);
+  opacity: 0.4;
+  background-color: rgba(200, 200, 200, 0.4);
 }
 
 .dice {
@@ -173,7 +173,7 @@ main {
 }
 
 .hidden {
-  display: none;
+  display: none !important;
 }
 
 /* STYLES FOR GAME SETUP SCREEN */
@@ -188,6 +188,7 @@ main {
   align-items: center;
   gap: 2rem;
   color: #444;
+  min-width: 50rem;
 }
 
 #game-setup h1 {
@@ -219,7 +220,7 @@ main {
 }
 
 #game-setup button:active {
-  transform: translateY(3px);
+  transform: translateY(1px);
   box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.15);
 }
 
@@ -229,8 +230,20 @@ main {
   text-align: center;
   padding: 1rem 2rem;
   border-radius: 50rem;
-  border: 1px solid #ddd;
+  border: 2px solid #ddd;
   margin-right: 1rem;
+  text-transform: uppercase;
+}
+
+#game-setup input:focus {
+  outline: none;
+  border-color: #c7365f;
+}
+
+#join-game-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
 
 #game-code-display {
@@ -243,13 +256,17 @@ main {
 
 #status-message {
   position: absolute;
-  top: 12rem;
+  top: 10rem;
   left: 50%;
   transform: translateX(-50%);
-  font-size: 2rem;
-  font-weight: 500;
-  color: #333;
-  background-color: rgba(255, 255, 255, 0.8);
-  padding: 1rem 2rem;
+  font-size: 2.4rem;
+  font-weight: 600;
+  color: #fff;
+  background-color: rgba(199, 54, 95, 0.9);
+  padding: 1.5rem 3rem;
   border-radius: 50rem;
+  box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.2);
+  white-space: nowrap;
+  z-index: 100;
+  display: none;
 }

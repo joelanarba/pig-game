@@ -31,19 +31,22 @@ joinGameBtn.addEventListener('click', () => {
 });
 
 btnRoll.addEventListener('click', () => {
-  if (roomCode) {
+  if (roomCode && !btnRoll.disabled) {
+    console.log('Rolling dice...');
     socket.emit('rollDice', roomCode);
   }
 });
 
 btnHold.addEventListener('click', () => {
-  if (roomCode) {
+  if (roomCode && !btnHold.disabled) {
+    console.log('Holding score...');
     socket.emit('holdScore', roomCode);
   }
 });
 
 btnNew.addEventListener('click', () => {
   if (roomCode) {
+    console.log('Starting new game...');
     socket.emit('newGame', roomCode);
   }
 });
@@ -53,8 +56,10 @@ btnNew.addEventListener('click', () => {
 socket.on('gameCreated', code => {
   console.log('Game created with code:', code);
   roomCode = code;
+  myPlayerNumber = 0; // Creator is always player 0
   showGame();
-  statusMessageEl.textContent = `Waiting for opponent... Code: ${code}`;
+  statusMessageEl.textContent = `Waiting for opponent... Share code: ${code}`;
+  statusMessageEl.style.display = 'block';
   btnRoll.disabled = true;
   btnHold.disabled = true;
 });
@@ -75,17 +80,33 @@ socket.on('startGame', ({ gameState, playerNumber }) => {
   
   showGame();
   updateUI(gameState, null, myPlayerNumber);
-  statusMessageEl.textContent = 'Game started!';
+  
+  // Show whose turn it is
+  const isMyTurn = gameState.activePlayer === myPlayerNumber;
+  if (isMyTurn) {
+    statusMessageEl.textContent = "It's YOUR turn! 🎲";
+  } else {
+    statusMessageEl.textContent = "Opponent's turn...";
+  }
+  statusMessageEl.style.display = 'block';
   
   // Enable buttons if it's your turn
-  const isMyTurn = gameState.activePlayer === myPlayerNumber;
   btnRoll.disabled = !isMyTurn;
   btnHold.disabled = !isMyTurn;
 });
 
 socket.on('updateGameState', ({ game, dice }) => {
-  console.log('Game state updated');
+  console.log('Game state updated, dice:', dice);
   updateUI(game, dice, myPlayerNumber);
+  
+  // Update status message
+  const isMyTurn = game.activePlayer === myPlayerNumber;
+  if (isMyTurn) {
+    statusMessageEl.textContent = "It's YOUR turn! 🎲";
+  } else {
+    statusMessageEl.textContent = "Opponent's turn...";
+  }
+  statusMessageEl.style.display = 'block';
 });
 
 socket.on('gameOver', ({ game, winner }) => {
@@ -93,8 +114,9 @@ socket.on('gameOver', ({ game, winner }) => {
   updateUI(game, null, myPlayerNumber);
   showWinner(winner);
   
-  const winnerText = winner === myPlayerNumber ? 'You won! 🎉' : 'You lost! 😢';
+  const winnerText = winner === myPlayerNumber ? '🎉 You WON! 🎉' : '😢 You lost!';
   statusMessageEl.textContent = winnerText;
+  statusMessageEl.style.display = 'block';
 });
 
 socket.on('playerLeft', message => {
