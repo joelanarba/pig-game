@@ -14,19 +14,22 @@ html {
 body {
   font-family: 'Nunito', sans-serif;
   font-weight: 400;
-  height: 100vh;
+  min-height: 100vh;
   color: #333;
   background-image: linear-gradient(to top left, #753682 0%, #bf2e34 100%);
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 1rem;
 }
 
 /* LAYOUT */
 main {
   position: relative;
-  width: 100rem;
-  height: 60rem;
+  width: 100%;
+  max-width: 100rem;
+  height: auto;
+  min-height: 60rem;
   background-color: rgba(255, 255, 255, 0.35);
   backdrop-filter: blur(200px);
   box-shadow: 0 3rem 5rem rgba(0, 0, 0, 0.25);
@@ -37,7 +40,7 @@ main {
 
 .player {
   flex: 50%;
-  padding: 9rem;
+  padding: 9rem 3rem 3rem;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -178,7 +181,7 @@ main {
 
 /* STYLES FOR GAME SETUP SCREEN */
 #game-setup {
-  padding: 4rem;
+  padding: 4rem 2rem;
   background-color: rgba(255, 255, 255, 0.6);
   backdrop-filter: blur(10px);
   border-radius: 9px;
@@ -188,19 +191,26 @@ main {
   align-items: center;
   gap: 2rem;
   color: #444;
-  min-width: 50rem;
+  width: 100%;
+  max-width: 50rem;
 }
 
 #game-setup h1 {
-  font-size: 4rem;
+  font-size: 3.5rem;
   text-transform: uppercase;
   letter-spacing: 1px;
   margin-bottom: 1rem;
+  text-align: center;
+}
+
+#game-setup p {
+  text-align: center;
+  padding: 0 1rem;
 }
 
 #game-setup button {
   font-family: inherit;
-  font-size: 1.8rem;
+  font-size: 1.6rem;
   text-transform: uppercase;
   cursor: pointer;
   font-weight: 400;
@@ -211,6 +221,8 @@ main {
   border-radius: 50rem;
   box-shadow: 0 1.75rem 3.5rem rgba(0, 0, 0, 0.1);
   transition: all 0.2s;
+  width: 100%;
+  max-width: 30rem;
 }
 
 #game-setup button:hover {
@@ -226,13 +238,14 @@ main {
 
 #game-setup input {
   font-family: inherit;
-  font-size: 1.8rem;
+  font-size: 1.6rem;
   text-align: center;
   padding: 1rem 2rem;
   border-radius: 50rem;
   border: 2px solid #ddd;
-  margin-right: 1rem;
   text-transform: uppercase;
+  width: 100%;
+  max-width: 20rem;
 }
 
 #game-setup input:focus {
@@ -242,8 +255,10 @@ main {
 
 #join-game-section {
   display: flex;
+  flex-direction: column;
   align-items: center;
   gap: 1rem;
+  width: 100%;
 }
 
 #game-code-display {
@@ -256,17 +271,292 @@ main {
 
 #status-message {
   position: absolute;
-  top: 10rem;
+  top: 2rem;
   left: 50%;
   transform: translateX(-50%);
-  font-size: 2.4rem;
+  font-size: 1.8rem;
   font-weight: 600;
   color: #fff;
   background-color: rgba(199, 54, 95, 0.9);
-  padding: 1.5rem 3rem;
+  padding: 1rem 2rem;
   border-radius: 50rem;
   box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.2);
   white-space: nowrap;
   z-index: 100;
   display: none;
+  max-width: 90%;
+  text-align: center;
+}
+
+/* RESPONSIVE DESIGN */
+
+/* Tablets and small desktops */
+@media (max-width: 768px) {
+  html {
+    font-size: 56.25%; /* 9px */
+  }
+
+  main {
+    min-height: 50rem;
+  }
+
+  .player {
+    padding: 7rem 2rem 2rem;
+  }
+
+  .name {
+    font-size: 3rem;
+  }
+
+  .score {
+    font-size: 6rem;
+  }
+
+  .current {
+    width: 75%;
+    padding: 1.5rem;
+  }
+
+  .current-score {
+    font-size: 3rem;
+  }
+
+  .btn {
+    font-size: 1.6rem;
+    padding: 0.6rem 2rem;
+  }
+
+  .btn--new {
+    top: 3rem;
+  }
+
+  .btn--roll {
+    top: 35rem;
+  }
+
+  .btn--hold {
+    top: 41rem;
+  }
+
+  .dice {
+    top: 14rem;
+    height: 8rem;
+  }
+
+  #game-setup h1 {
+    font-size: 3rem;
+  }
+
+  #status-message {
+    font-size: 1.6rem;
+    padding: 0.8rem 1.5rem;
+  }
+}
+
+/* Mobile devices */
+@media (max-width: 480px) {
+  html {
+    font-size: 50%; /* 8px */
+  }
+
+  body {
+    padding: 0.5rem;
+  }
+
+  main {
+    flex-direction: column;
+    min-height: auto;
+    height: auto;
+    border-radius: 6px;
+  }
+
+  .player {
+    flex: none;
+    width: 100%;
+    padding: 3rem 1.5rem 2rem;
+    min-height: 25rem;
+  }
+
+  .name {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .score {
+    font-size: 5rem;
+    margin-bottom: 1rem;
+  }
+
+  .current {
+    width: 85%;
+    padding: 1.2rem;
+  }
+
+  .current-label {
+    font-size: 1.4rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .current-score {
+    font-size: 2.5rem;
+  }
+
+  /* Reposition buttons for vertical layout */
+  .btn {
+    font-size: 1.4rem;
+    padding: 0.8rem 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .btn::first-letter {
+    font-size: 1.8rem;
+    margin-right: 0.5rem;
+  }
+
+  .btn--new {
+    top: auto;
+    bottom: 2rem;
+    left: 50%;
+  }
+
+  .btn--roll {
+    top: auto;
+    bottom: 15rem;
+    left: 25%;
+    transform: translateX(-50%);
+  }
+
+  .btn--hold {
+    top: auto;
+    bottom: 15rem;
+    right: 25%;
+    left: auto;
+    transform: translateX(50%);
+  }
+
+  .dice {
+    top: auto;
+    bottom: 21rem;
+    height: 7rem;
+  }
+
+  #game-setup {
+    padding: 3rem 1.5rem;
+    border-radius: 6px;
+  }
+
+  #game-setup h1 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  #game-setup p {
+    font-size: 1.4rem;
+  }
+
+  #game-setup button {
+    font-size: 1.4rem;
+    padding: 0.8rem 2rem;
+  }
+
+  #game-setup input {
+    font-size: 1.4rem;
+    padding: 0.8rem 1.5rem;
+  }
+
+  #status-message {
+    font-size: 1.4rem;
+    padding: 0.7rem 1.2rem;
+    white-space: normal;
+    top: 1rem;
+  }
+}
+
+/* Extra small devices */
+@media (max-width: 360px) {
+  html {
+    font-size: 45%; /* 7.2px */
+  }
+
+  .player {
+    padding: 2.5rem 1rem 1.5rem;
+    min-height: 22rem;
+  }
+
+  .name {
+    font-size: 2.2rem;
+  }
+
+  .score {
+    font-size: 4.5rem;
+  }
+
+  .btn {
+    font-size: 1.3rem;
+    padding: 0.7rem 1.5rem;
+  }
+
+  .dice {
+    height: 6rem;
+    bottom: 20rem;
+  }
+
+  .btn--roll,
+  .btn--hold {
+    bottom: 14rem;
+  }
+
+  #game-setup h1 {
+    font-size: 2.2rem;
+  }
+}
+
+/* Landscape mode for mobile */
+@media (max-width: 768px) and (orientation: landscape) {
+  main {
+    flex-direction: row;
+    min-height: auto;
+    height: 90vh;
+  }
+
+  .player {
+    flex: 50%;
+    padding: 5rem 2rem 2rem;
+    min-height: auto;
+  }
+
+  .score {
+    font-size: 4.5rem;
+  }
+
+  .btn--new {
+    top: 2rem;
+    bottom: auto;
+  }
+
+  .btn--roll {
+    top: auto;
+    bottom: 8rem;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .btn--hold {
+    top: auto;
+    bottom: 3rem;
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+  }
+
+  .dice {
+    top: 12rem;
+    bottom: auto;
+    height: 7rem;
+  }
+
+  #status-message {
+    top: 1rem;
+  }
 }
