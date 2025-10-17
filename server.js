@@ -17,7 +17,9 @@ function getGameStateForClient(room) {
     scores: [...room.scores],
     currentScore: room.currentScore,
     activePlayer: room.activePlayer,
-    playing: room.playing
+    playing: room.playing,
+    wins: [...room.wins],
+    totalDiceRolls: room.totalDiceRolls
   };
 }
 
@@ -39,6 +41,8 @@ io.on('connection', socket => {
       currentScore: 0,
       activePlayer: 0,
       playing: false, // NOT playing until second player joins
+      wins: [0, 0], // Track wins for each player
+      totalDiceRolls: 0 // Track total dice rolls in session
     };
     
     console.log(`🎮 Game created: ${roomCode} by ${socket.id}`);
@@ -105,7 +109,8 @@ io.on('connection', socket => {
     }
 
     const dice = Math.trunc(Math.random() * 6) + 1;
-    console.log(`🎲 Player ${playerNumber} rolled ${dice}`);
+    room.totalDiceRolls++; // Increment total dice rolls
+    console.log(`🎲 Player ${playerNumber} rolled ${dice} (Total rolls: ${room.totalDiceRolls})`);
 
     if (dice !== 1) {
       room.currentScore += dice;
@@ -151,7 +156,9 @@ io.on('connection', socket => {
     if (room.scores[room.activePlayer] >= 100) {
       room.playing = false;
       const winner = room.activePlayer;
+      room.wins[winner]++; // Increment win count for winner
       console.log(`🎉 Player ${winner} WINS!`);
+      console.log(`   Win count: [${room.wins[0]}, ${room.wins[1]}]`);
       
       const gameState = getGameStateForClient(room);
       io.to(roomCode).emit('gameOver', { 
@@ -176,6 +183,7 @@ io.on('connection', socket => {
 
     console.log(`🔄 New game starting in ${roomCode}`);
     
+    // Reset game state but KEEP wins and totalDiceRolls
     room.scores = [0, 0];
     room.currentScore = 0;
     room.activePlayer = 0;

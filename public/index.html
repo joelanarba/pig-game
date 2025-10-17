@@ -31,6 +31,22 @@
 
     <!-- Game Board (Hidden by default) -->
     <main style="display: none;">
+        <!-- Stats Bar at the top -->
+        <div id="stats-bar">
+            <div class="stat-item">
+                <span class="stat-label">Player 1 Wins</span>
+                <span class="stat-value" id="wins--0">0</span>
+            </div>
+            <div class="stat-item stat-center">
+                <span class="stat-label">🎲 Total Rolls</span>
+                <span class="stat-value" id="total-rolls">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Player 2 Wins</span>
+                <span class="stat-value" id="wins--1">0</span>
+            </div>
+        </div>
+
         <p id="status-message"></p>
         
         <section class="player player--0 player--active">

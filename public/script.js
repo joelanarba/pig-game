@@ -7,6 +7,9 @@ const score0El = document.querySelector('#score--0');
 const score1El = document.getElementById('score--1');
 const current0El = document.getElementById('current--0');
 const current1El = document.getElementById('current--1');
+const wins0El = document.getElementById('wins--0');
+const wins1El = document.getElementById('wins--1');
+const totalRollsEl = document.getElementById('total-rolls');
 const diceEl = document.querySelector('.dice');
 const gameSetupDiv = document.getElementById('game-setup');
 const mainGame = document.querySelector('main');
@@ -18,12 +21,19 @@ function updateUI(gameState, diceValue, myPlayerNumber) {
     currentScore: gameState.currentScore,
     activePlayer: gameState.activePlayer,
     playing: gameState.playing,
+    wins: gameState.wins,
+    totalDiceRolls: gameState.totalDiceRolls,
     dice: diceValue
   });
   
   // Update scores - ALWAYS use server values
   score0El.textContent = gameState.scores[0];
   score1El.textContent = gameState.scores[1];
+  
+  // Update wins and total rolls
+  wins0El.textContent = gameState.wins[0];
+  wins1El.textContent = gameState.wins[1];
+  totalRollsEl.textContent = gameState.totalDiceRolls;
   
   // Reset ALL current scores to 0 first
   current0El.textContent = 0;
@@ -96,6 +106,9 @@ function hideGame() {
   score1El.textContent = 0;
   current0El.textContent = 0;
   current1El.textContent = 0;
+  wins0El.textContent = 0;
+  wins1El.textContent = 0;
+  totalRollsEl.textContent = 0;
   diceEl.classList.add('hidden');
   player0El.classList.remove('player--winner', 'player--active');
   player1El.classList.remove('player--winner', 'player--active');
