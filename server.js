@@ -19,7 +19,7 @@ function getGameStateForClient(room) {
     activePlayer: room.activePlayer,
     playing: room.playing,
     wins: [...room.wins],
-    totalDiceRolls: room.totalDiceRolls
+    overallPoints: [...room.overallPoints]
   };
 }
 
@@ -42,7 +42,7 @@ io.on('connection', socket => {
       activePlayer: 0,
       playing: false, // NOT playing until second player joins
       wins: [0, 0], // Track wins for each player
-      totalDiceRolls: 0 // Track total dice rolls in session
+      overallPoints: [0, 0] // Track cumulative points across all games
     };
     
     console.log(`🎮 Game created: ${roomCode} by ${socket.id}`);
@@ -109,8 +109,7 @@ io.on('connection', socket => {
     }
 
     const dice = Math.trunc(Math.random() * 6) + 1;
-    room.totalDiceRolls++; // Increment total dice rolls
-    console.log(`🎲 Player ${playerNumber} rolled ${dice} (Total rolls: ${room.totalDiceRolls})`);
+    console.log(`🎲 Player ${playerNumber} rolled ${dice}`);
 
     if (dice !== 1) {
       room.currentScore += dice;
@@ -147,9 +146,15 @@ io.on('connection', socket => {
       return;
     }
 
+    // Add current score to player's game score
     room.scores[room.activePlayer] += room.currentScore;
+    
+    // Add current score to overall points (only banked points count!)
+    room.overallPoints[room.activePlayer] += room.currentScore;
+    
     console.log(`📥 Player ${room.activePlayer} held score: ${room.currentScore}`);
-    console.log(`   Total scores: [${room.scores[0]}, ${room.scores[1]}]`);
+    console.log(`   Game scores: [${room.scores[0]}, ${room.scores[1]}]`);
+    console.log(`   Overall points: [${room.overallPoints[0]}, ${room.overallPoints[1]}]`);
     
     room.currentScore = 0;
 
@@ -158,7 +163,9 @@ io.on('connection', socket => {
       const winner = room.activePlayer;
       room.wins[winner]++; // Increment win count for winner
       console.log(`🎉 Player ${winner} WINS!`);
+      console.log(`   Final game scores: [${room.scores[0]}, ${room.scores[1]}]`);
       console.log(`   Win count: [${room.wins[0]}, ${room.wins[1]}]`);
+      console.log(`   Overall points: [${room.overallPoints[0]}, ${room.overallPoints[1]}]`);
       
       const gameState = getGameStateForClient(room);
       io.to(roomCode).emit('gameOver', { 
@@ -182,8 +189,9 @@ io.on('connection', socket => {
     if (!room) return;
 
     console.log(`🔄 New game starting in ${roomCode}`);
+    console.log(`   Previous overall points: [${room.overallPoints[0]}, ${room.overallPoints[1]}]`);
     
-    // Reset game state but KEEP wins and totalDiceRolls
+    // Reset game state but KEEP wins and overallPoints
     room.scores = [0, 0];
     room.currentScore = 0;
     room.activePlayer = 0;
@@ -216,6 +224,9 @@ io.on('connection', socket => {
     for (const roomCode in gameRooms) {
       if (gameRooms[roomCode].players[socket.id] !== undefined) {
         console.log(`   Notifying room ${roomCode}`);
+        console.log(`   Final session stats:`);
+        console.log(`     Wins: [${gameRooms[roomCode].wins[0]}, ${gameRooms[roomCode].wins[1]}]`);
+        console.log(`     Overall Points: [${gameRooms[roomCode].overallPoints[0]}, ${gameRooms[roomCode].overallPoints[1]}]`);
         io.to(roomCode).emit('playerLeft', 'The other player has disconnected.');
         delete gameRooms[roomCode];
         break;
